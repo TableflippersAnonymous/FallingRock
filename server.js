@@ -52,11 +52,13 @@ function buildDatabase() {
     winston.info('Loading in-memory database.');
     return okta.buildOktaDirectory().then(function(oktaDirectory) {
         oktaDirectory.groups.forEach(function(group) {
+            winston.info('Loading group (pass 1): %s', group);
             var dn = interpolateObject(config.okta.groupDN, group);
             group.dn = ldap.parseDN(dn).toString();
         });
 
         oktaDirectory.users.forEach(function(user) {
+            winston.info('Loading user (pass 1): %s', user);
             user.shortName = user.profile.email.split('@')[0];
             var dn = interpolateObject(config.okta.userDN, user);
             user.dn = ldap.parseDN(dn).toString();
@@ -67,10 +69,12 @@ function buildDatabase() {
         addParents(db, config.okta.groupDN);
 
         oktaDirectory.groups.forEach(function(group) {
+            winston.info('Loading group (pass 2): %s', group);
             var o = interpolateObject(config.okta.groupAttributes, group);
             db[group.dn] = {attributes: o, original: group, type: 'group'};
         });
         oktaDirectory.users.forEach(function(user) {
+            winston.info('Loading user (pass 2): %s', user);
             var o = interpolateObject(config.okta.userAttributes, user);
             db[user.dn] = {attributes: o, original: user, type: 'user'};
         });
@@ -193,7 +197,7 @@ buildDatabase().then(function(someDatabase) {
         return next();
     });
 
-    server.bind('', authorize, function(req, res, next) {
+    server.bind('', function(req, res, next) {
         var db = getCurrentDB();
         var dn = req.dn.toString();
         if (!db[dn] || db[dn].type !== 'user') {

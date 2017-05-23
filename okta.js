@@ -14,6 +14,7 @@ function createOktaClient(oktaConfig) {
             function getInner(url, acc) {
                 request(url, {
                     headers: {
+                      'User-Agent': 'FallingRock/1.0 (see: https://github.com/TableflippersAnonymous/FallingRock)',
                       'Content-Type': 'application/json',
                       'Accept': 'application/json',
                       'Authorization': 'SSWS ' + oktaConfig.token
@@ -117,6 +118,7 @@ function createOktaClient(oktaConfig) {
               `${oktaConfig.url}/api/v1/authn`, {
                   method: 'POST',
                   headers: {
+                      'User-Agent': 'FallingRock/1.0 (see: https://github.com/TableflippersAnonymous/FallingRock)',
                       'Content-Type': 'application/json',
                       'Accept': 'application/json',
                       'Authorization': 'SSWS ' + oktaConfig.token
